@@ -1,0 +1,7 @@
+{
+  "chromedriver_path": "C:\\absolute\\path\\to\\chromedriver.exe",
+  "eservices": {
+    "url": "https://eservices.minnstate.edu/finance-student/timeWorked.do?functionid=3705&campusid=071",
+    "username": ""
+  }
+}

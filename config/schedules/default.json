@@ -1,0 +1,24 @@
+{
+  "sunday": -1,
+  "monday": {
+    "start": "0100PM",
+    "end": "0500PM"
+  },
+  "tuesday": {
+    "start": "0800AM",
+    "end": "1200PM"
+  },
+  "wednesday": {
+    "start": "0100PM",
+    "end": "0500PM"
+  },
+  "thursday": {
+    "start": "0800AM",
+    "end": "1200PM"
+  },
+  "friday": {
+    "start": "0800AM",
+    "end": "1200PM"
+  },
+  "saturday": -1
+}
