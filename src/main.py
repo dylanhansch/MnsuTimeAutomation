@@ -84,9 +84,10 @@ browser.get(config['eservices']['url'])
 
 # Login
 elem = browser.find_element_by_id('userName')
-elem.send_keys(config['eservices']['username'])
+username = config['eservices']['username'] if config['eservices']['username'] else input('eServices Username:')
+elem.send_keys(username)
 elem = browser.find_element_by_id('password')
-pwd = input('eServices Password:')
+pwd = config['eservices']['password'] if config['eservices']['password'] else input('eServices Password:')
 elem.send_keys(pwd + Keys.RETURN)
 
 # Days where time has already been entered, so we don't go over them again (wasting time)
