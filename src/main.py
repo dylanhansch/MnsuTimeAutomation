@@ -1,4 +1,3 @@
-from json import load as json_load
 import json_config
 from os.path import dirname, join
 from selenium import webdriver
