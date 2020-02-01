@@ -1,3 +1,4 @@
+import getpass
 import json_config
 from os.path import dirname, join
 from selenium import webdriver
@@ -78,6 +79,13 @@ def load_times_from_file(file: str = 'default') -> None:
                 elem2.click()
 
 
+def get_password_from_terminal(prompt='eServices Password:'):
+    if config['password_prompt_fallback']:
+        return input(prompt)
+
+    return getpass.getpass(prompt=prompt)
+
+
 # MNSU eServices
 browser.get(config['eservices']['url'])
 
@@ -86,7 +94,7 @@ elem = browser.find_element_by_id('userName')
 username = config['eservices']['username'] if config['eservices']['username'] else input('eServices Username:')
 elem.send_keys(username)
 elem = browser.find_element_by_id('password')
-pwd = config['eservices']['password'] if config['eservices']['password'] else input('eServices Password:')
+pwd = config['eservices']['password'] if config['eservices']['password'] else get_password_from_terminal()
 elem.send_keys(pwd + Keys.RETURN)
 
 # Days where time has already been entered, so we don't go over them again (wasting time)

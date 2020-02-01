@@ -12,9 +12,11 @@ MNSU eServices time entry is painfully tedious and takes quite a bit of time to 
 8. Update the default schedule config or create a new schedule config if needed
 
 # Running
-You can run this multiple different ways. The most common are from the IDE or the terminal.
+The recommended way to run this is from the terminal.
 
-For the terminal `cd` to the project root and run `pipenv shell`. This will launch a subshell with the virtual environment loaded. From there you can execute the main.py script as you normally would.
+`cd` to the project root and run `pipenv shell`. This will launch a subshell with the virtual environment loaded. From there you can execute the main.py script as you normally would.
+
+**NOTE**: You *can* run this from an IDE however this script uses Python's "getpass" module to enable the user to 'safely' input their password via the terminal if it is not specified in the config. This module does not always work well with IDEs which use their own console/terminal (e.g. PyCharm). Change the "password_prompt_fallback" configuration option to true if you wish to use Python's input() function instead which should work in almost all cases (though your password will be displayed in the terminal as you type).
 
 # Contributing
 If you would like to contribute please make your changes in a descriptively named branch and open a pull request outlining your changes. If you're looking for ideas for how you can contribute check out the GitHub issues! Thanks for your interest!

@@ -4,5 +4,6 @@
     "url": "https://eservices.minnstate.edu/finance-student/timeWorked.do?functionid=3705&campusid=071",
     "username": "",
     "password": ""
-  }
+  },
+  "password_prompt_fallback": false
 }
