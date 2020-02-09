@@ -2,14 +2,12 @@
 MNSU eServices time entry is painfully tedious and takes quite a bit of time to complete every pay cycle. This script automates the majority of the process so it takes roughly 5% as much time to get time entered.
 
 # Installation
-1. Install pipenv if you don't already have it
-2. Install dependencies. From the project root run: `pipenv install`
-3. Install the selenium chromedriver somewhere on your system
-4. Rename config.dist.json to config.json
-5. Update the absolute path to the chromedriver in config.json
-6. Add your eservices username in config.json
-7. Update any other values as needed in config.json
-8. Update the default schedule config or create a new schedule config if needed
+1. Install pipenv if you don't already have it.
+2. Install dependencies. From the project root run: `pipenv install`.
+3. Install the selenium chromedriver somewhere on your system.
+4. Rename `config/config.dist.json` to `config/config.json`.
+5. Update values in the config as needed (e.g. chromedriver absolute path, eservices username, etc.).
+6. Create a schedule config in `config/schedules` - use example.json as an example. Name your default schedule config "default.json".
 
 # Running
 The recommended way to run this is from the terminal.
