@@ -76,9 +76,9 @@ def detect_day(input_string: str) -> str:
     return day
 
 
-def load_times_from_file(file: str = 'default', days_entered: list = None) -> None:
-    if not days_entered:
-        days_entered = list()
+def load_times_from_file(file: str = 'default', skip_days: list = None) -> None:
+    if not skip_days:
+        skip_days = list()
 
     schedule_config = json_config.connect(join(dirname(__file__), '..', 'config', 'schedules', file + '.json'))
 
@@ -92,7 +92,7 @@ def load_times_from_file(file: str = 'default', days_entered: list = None) -> No
         day = detect_day(date_text)
 
         # Time must not already be entered in eServices
-        if date_text not in days_entered:
+        if date_text not in skip_days:
             if not schedule_config[day] or schedule_config[day] == -1:
                 continue
 
@@ -161,7 +161,7 @@ def main() -> None:
                                     'specify the filename without json extension):')
 
     if not load_from_specific_file:
-        load_times_from_file(days_entered=days_entered)
+        load_times_from_file(skip_days=days_entered)
     else:
         load_times_from_file(load_from_specific_file, days_entered)
 
