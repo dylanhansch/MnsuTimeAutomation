@@ -113,7 +113,7 @@ def load_times_from_file(file: str = 'default') -> None:
                 wait.until(expected_conditions.presence_of_element_located((By.ID, 'addTime'))).click()
 
 
-def get_password_from_terminal(prompt='eServices Password:'):
+def get_password_from_terminal(prompt: str = 'eServices Password:') -> str:
     if config['password_prompt_fallback']:
         return input(prompt)
 
