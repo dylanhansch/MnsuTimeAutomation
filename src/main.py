@@ -131,6 +131,8 @@ elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'passw
 pwd = config['eservices']['password'] if config['eservices']['password'] else get_password_from_terminal()
 elem.send_keys(pwd + Keys.RETURN)
 
+wait.until(expected_conditions.title_contains('Student Employment'))
+
 # Days where time has already been entered, so we don't go over them again (wasting time)
 days_entered = list()
 
@@ -141,7 +143,7 @@ except selenium_exceptions.TimeoutException:
     elems = list()
 
 for elem in elems:
-    txt = wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'td'))).text
+    txt = elem.find_element_by_css_selector('td').text
     if txt != 'Total Hours':
         days_entered.append(txt)
 
