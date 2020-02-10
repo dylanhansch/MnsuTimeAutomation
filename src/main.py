@@ -76,7 +76,10 @@ def detect_day(input_string: str) -> str:
     return day
 
 
-def load_times_from_file(file: str = 'default') -> None:
+def load_times_from_file(file: str = 'default', days_entered: list = None) -> None:
+    if not days_entered:
+        days_entered = list()
+
     schedule_config = json_config.connect(join(dirname(__file__), '..', 'config', 'schedules', file + '.json'))
 
     # Cycle through the dropdown and accept hours worked for unentered weekdays
@@ -120,46 +123,50 @@ def get_password_from_terminal(prompt: str = 'eServices Password:') -> str:
     return getpass.getpass(prompt=prompt)
 
 
-# MNSU eServices
-browser.get(config['eservices']['url'])
+def main() -> None:
+    # MNSU eServices
+    browser.get(config['eservices']['url'])
 
-# Login
-elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'userName')))
-username = config['eservices']['username'] if config['eservices']['username'] else input('eServices Username:')
-elem.send_keys(username)
-elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'password')))
-pwd = config['eservices']['password'] if config['eservices']['password'] else get_password_from_terminal()
-elem.send_keys(pwd + Keys.RETURN)
+    # Login
+    elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'userName')))
+    username = config['eservices']['username'] if config['eservices']['username'] else input('eServices Username:')
+    elem.send_keys(username)
+    elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'password')))
+    pwd = config['eservices']['password'] if config['eservices']['password'] else get_password_from_terminal()
+    elem.send_keys(pwd + Keys.RETURN)
 
-wait.until(expected_conditions.title_contains('Student Employment'))
+    wait.until(expected_conditions.title_contains('Student Employment'))
 
-# Days where time has already been entered, so we don't go over them again (wasting time)
-days_entered = list()
+    # Days where time has already been entered, so we don't go over them again (wasting time)
+    days_entered = list()
 
-try:
-    elems = wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, 'tbody > tr')))
-except selenium_exceptions.TimeoutException:
-    # if no time has been entered, selenium will timeout searching for elements
-    elems = list()
+    try:
+        elems = wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, 'tbody > tr')))
+    except selenium_exceptions.TimeoutException:
+        # if no time has been entered, selenium will timeout searching for elements
+        elems = list()
 
-for elem in elems:
-    txt = elem.find_element_by_css_selector('td').text
-    if txt != 'Total Hours':
-        days_entered.append(txt)
+    for elem in elems:
+        txt = elem.find_element_by_css_selector('td').text
+        if txt != 'Total Hours':
+            days_entered.append(txt)
+
+    days_entered = standardize_dates(days_entered)
+
+    # Go to the "add time" page
+    elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'addTime')))
+    elem.click()
+
+    load_from_specific_file = input('Load from specific file? (empty for default.json, '
+                                    'specify the filename without json extension):')
+
+    if not load_from_specific_file:
+        load_times_from_file(days_entered=days_entered)
+    else:
+        load_times_from_file(load_from_specific_file, days_entered)
+
+    browser.quit()
 
 
-days_entered = standardize_dates(days_entered)
-
-# Go to the "add time" page
-elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'addTime')))
-elem.click()
-
-load_from_default_file = input('Load from specific file? (empty for default.json, '
-                               'specify the filename without json extension):')
-
-if not load_from_default_file:
-    load_times_from_file()
-else:
-    load_times_from_file(load_from_default_file)
-
-browser.quit()
+if __name__ == '__main__':
+    main()
