@@ -2,11 +2,44 @@ import getpass
 import json_config
 from os.path import dirname, join
 from selenium import webdriver
+from selenium.common import exceptions as selenium_exceptions
+from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions
+import sys
 
 config = json_config.connect(join(dirname(__file__), '..', 'config', 'config.json'))
 
-browser = webdriver.Chrome(config['chromedriver_path'])
+webdriver_driver = str.lower(config['webdriver']['driver'] or '')
+webdriver_path = config['webdriver']['path']
+
+if not webdriver_path:
+    print('Config Error: You must specify a valid webdriver path.')
+    sys.exit(1)
+
+if webdriver_driver == 'chrome':
+    browser = webdriver.Chrome(executable_path=webdriver_path)
+elif webdriver_driver == 'firefox':
+    browser = webdriver.Firefox(executable_path=webdriver_path)
+elif webdriver_driver == 'edge':
+    browser = webdriver.Edge(executable_path=webdriver_path)
+elif webdriver_driver == 'ie':
+    browser = webdriver.Ie(executable_path=webdriver_path)
+elif webdriver_driver == 'safari':
+    browser = webdriver.Safari(executable_path=webdriver_path)
+elif webdriver_driver == 'opera':
+    browser = webdriver.Opera(executable_path=webdriver_path)
+elif webdriver_driver == 'phantomjs':
+    browser = webdriver.PhantomJS(executable_path=webdriver_path)
+elif webdriver_driver == 'webkitgtk':
+    browser = webdriver.WebKitGTK(executable_path=webdriver_path)
+else:
+    print('Config Error: You must specify a valid supported webdriver. '
+          'Options: chrome, firefox, edge, ie, safari, opera, phantomjs, webkitgtk')
+    sys.exit(1)
+
+wait = WebDriverWait(browser, float(config['webdriver']['timeout']) if config['webdriver']['timeout'] else 2)
 
 
 def standardize_dates(input_list: list) -> list:
@@ -47,9 +80,9 @@ def load_times_from_file(file: str = 'default') -> None:
     schedule_config = json_config.connect(join(dirname(__file__), '..', 'config', 'schedules', file + '.json'))
 
     # Cycle through the dropdown and accept hours worked for unentered weekdays
-    elems = browser.find_elements_by_css_selector('#date > option')
+    elems = wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, '#date > option')))
     for i in range(0, elems.__len__()):
-        elem = browser.find_elements_by_css_selector('#date > option')[i]
+        elem = wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, '#date > option')))[i]
         date_text = elem.text
 
         # Day from the date (date_text)
@@ -67,16 +100,17 @@ def load_times_from_file(file: str = 'default') -> None:
             elem.click()
 
             # Set the times
-            browser.find_element_by_css_selector('#startTime > option[value="' + start_time + '"]').click()
-            browser.find_element_by_css_selector('#endTime > option[value="' + end_time + '"]').click()
+            wait.until(expected_conditions.presence_of_element_located(
+                (By.CSS_SELECTOR, '#startTime > option[value="' + start_time + '"]'))).click()
+            wait.until(expected_conditions.presence_of_element_located(
+                (By.CSS_SELECTOR, '#endTime > option[value="' + end_time + '"]'))).click()
 
             # Add time
-            browser.find_element_by_id('timeSaveOrAddId').click()
+            wait.until(expected_conditions.presence_of_element_located((By.ID, 'timeSaveOrAddId'))).click()
 
             # So long as we're not on the last element, head back to the "add time" page to loop through again
             if elems[-1] != elem:
-                elem2 = browser.find_element_by_id('addTime')
-                elem2.click()
+                wait.until(expected_conditions.presence_of_element_located((By.ID, 'addTime'))).click()
 
 
 def get_password_from_terminal(prompt='eServices Password:'):
@@ -90,19 +124,24 @@ def get_password_from_terminal(prompt='eServices Password:'):
 browser.get(config['eservices']['url'])
 
 # Login
-elem = browser.find_element_by_id('userName')
+elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'userName')))
 username = config['eservices']['username'] if config['eservices']['username'] else input('eServices Username:')
 elem.send_keys(username)
-elem = browser.find_element_by_id('password')
+elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'password')))
 pwd = config['eservices']['password'] if config['eservices']['password'] else get_password_from_terminal()
 elem.send_keys(pwd + Keys.RETURN)
 
 # Days where time has already been entered, so we don't go over them again (wasting time)
 days_entered = list()
 
-elems = browser.find_elements_by_css_selector('tbody > tr')
+try:
+    elems = wait.until(expected_conditions.presence_of_all_elements_located((By.CSS_SELECTOR, 'tbody > tr')))
+except selenium_exceptions.TimeoutException:
+    # if no time has been entered, selenium will timeout searching for elements
+    elems = list()
+
 for elem in elems:
-    txt = elem.find_element_by_css_selector('td').text
+    txt = wait.until(expected_conditions.presence_of_element_located((By.CSS_SELECTOR, 'td'))).text
     if txt != 'Total Hours':
         days_entered.append(txt)
 
@@ -112,7 +151,7 @@ for elem in elems:
 days_entered = standardize_dates(days_entered)
 
 # Go to the "add time" page
-elem = browser.find_element_by_id('addTime')
+elem = wait.until(expected_conditions.presence_of_element_located((By.ID, 'addTime')))
 elem.click()
 
 load_from_default_file = input('Load from specific file? (empty for default.json, '

@@ -4,9 +4,9 @@ MNSU eServices time entry is painfully tedious and takes quite a bit of time to 
 # Installation
 1. Install pipenv if you don't already have it.
 2. Install dependencies. From the project root run: `pipenv install`.
-3. Install the selenium chromedriver somewhere on your system.
+3. Install a [supported webdriver](https://github.com/dylanhansch/MnsuTimeAutomation/wiki/Supported-Webdrivers) somewhere on your system.
 4. Rename `config/config.dist.json` to `config/config.json`.
-5. Update values in the config as needed (e.g. chromedriver absolute path, eservices username, etc.).
+5. Update values in the config as needed (e.g. webdriver driver, webdriver absolute path, eservices username, etc.).
 6. Create a schedule config in `config/schedules` - use example.json as an example. Name your default schedule config "default.json".
 
 # Running
