@@ -147,8 +147,6 @@ for elem in elems:
     if txt != 'Total Hours':
         days_entered.append(txt)
 
-    continue
-
 
 days_entered = standardize_dates(days_entered)
 
